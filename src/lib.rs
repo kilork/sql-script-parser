@@ -325,7 +325,7 @@ impl<'a, Y, T: SqlScriptTokenizer<'a, Y>> SqlScriptParser<'a, Y, T> {
                 loop {
                     match (self.source.get(position), self.source.get(position + 1)) {
                         (Some(&b'*'), Some(&b'/')) => {
-                            position += 1;
+                            position += 2;
                             break;
                         }
                         (Some(_), _) => position += 1,
@@ -470,5 +470,25 @@ see it */;
 "#[..]
         );
         assert_eq!(sqls[3], b"/**/\nalter table me");
+    }
+
+    struct TestCommentSqlScriptTokenizer;
+    impl<'a> SqlScriptTokenizer<'a, SqlScript<'a>> for TestCommentSqlScriptTokenizer {
+        fn apply(&self, sql_script: SqlScript<'a>, tokens: &[SqlToken]) -> SqlScript<'a> {
+            assert_eq!(tokens[0].extract(&sql_script), b"/* comment */");
+            sql_script
+        }
+    }
+
+    #[test]
+    fn parse_comment() {
+        let test_script = b"/* comment */ INSERT INTO table ...";
+        let mut parser = SqlScriptParser::new(TestCommentSqlScriptTokenizer {}, test_script);
+
+        let mut output = vec![];
+        while let Some(sql) = parser.next() {
+            output.write_all(sql.statement).unwrap();
+        }
+        assert_eq!(output, &test_script[..]);
     }
 }
