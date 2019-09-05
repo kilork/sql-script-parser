@@ -298,10 +298,8 @@ impl<'a, Y, T: SqlScriptTokenizer<'a, Y>> SqlScriptParser<'a, Y, T> {
                         } else {
                             break;
                         }
-                    } else if ch == &b'\\' {
-                        if self.source.get(position) == Some(border) {
-                            position += 1;
-                        }
+                    } else if ch == &b'\\' && self.source.get(position) == Some(border) {
+                        position += 1;
                     }
                 }
                 Some((
@@ -475,7 +473,10 @@ see it */;
     struct TestCommentSqlScriptTokenizer;
     impl<'a> SqlScriptTokenizer<'a, SqlScript<'a>> for TestCommentSqlScriptTokenizer {
         fn apply(&self, sql_script: SqlScript<'a>, tokens: &[SqlToken]) -> SqlScript<'a> {
-            assert_eq!(tokens[0].extract(&sql_script), b"/* comment */");
+            assert_eq!(
+                tokens.get(0).map(|x| x.extract(&sql_script)),
+                Some(&b"/* comment */"[..])
+            );
             sql_script
         }
     }
@@ -483,10 +484,10 @@ see it */;
     #[test]
     fn parse_comment() {
         let test_script = b"/* comment */ INSERT INTO table ...";
-        let mut parser = SqlScriptParser::new(TestCommentSqlScriptTokenizer {}, test_script);
+        let parser = SqlScriptParser::new(TestCommentSqlScriptTokenizer {}, test_script);
 
         let mut output = vec![];
-        while let Some(sql) = parser.next() {
+        for sql in parser {
             output.write_all(sql.statement).unwrap();
         }
         assert_eq!(output, &test_script[..]);
