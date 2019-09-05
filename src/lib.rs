@@ -443,11 +443,11 @@ see it */;
 /**/
 alter table me"#;
 
-        let mut parser = sql_script_parser(test_script);
+        let parser = sql_script_parser(test_script);
 
         let mut output = vec![];
         let mut sqls = vec![];
-        while let Some(sql) = parser.next() {
+        for sql in parser {
             output.write_all(sql.statement).unwrap();
             sqls.push(sql.statement);
         }
