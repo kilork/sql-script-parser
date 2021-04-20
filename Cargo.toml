@@ -1,6 +1,6 @@
 [package]
 name = "sql-script-parser"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Alexander Korolev <kilork@yandex.ru>"]
 edition = "2018"
 categories = ["parser-implementations"]
@@ -12,7 +12,3 @@ keywords = ["sql", "parser", "tokenizer", "mysql"]
 license = "Unlicense OR MIT"
 readme = "README.md"
 repository = "https://github.com/kilork/sql-script-parser"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]

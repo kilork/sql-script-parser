@@ -117,7 +117,7 @@ const SP: &[u8] = b" \t\r\n";
 const SP_WO_LF: &[u8] = b" \t\r";
 
 /// SQL token. Start and end are indexes in source (global) array.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SqlToken {
     pub start: usize,
     pub end: usize,
@@ -131,7 +131,7 @@ impl SqlToken {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SqlTokenKind {
     Space,
     Comment,
